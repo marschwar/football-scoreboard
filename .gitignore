@@ -1,0 +1,20 @@
+# Package Files
+*.jar
+*.war
+*.ear
+
+# Serverless directories
+.serverless
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+*/out/
+/out
+
+### Gradle ###
+.gradle
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
