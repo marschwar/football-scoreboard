@@ -1,5 +1,6 @@
-package de.codekenner.footballscoreboard.handler
+package de.codekenner.footballscoreboard
 
+import com.amazonaws.services.lambda.runtime.Context
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.logging.log4j.LogManager
@@ -7,14 +8,49 @@ import org.apache.logging.log4j.Logger
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-class ApiGatewayResponse(
+interface Request {
+    val input: Map<String, Any>
+    val context: Context
+}
+
+enum class HttpMethod {
+    GET, POST, PUT, DELETE
+}
+
+data class ApiGatewayRequest(override val input: Map<String, Any>, override val context: Context) : Request {
+    val path: String
+        get() = input.getOrDefault(PATH, "") as String
+
+    val httpMethod: HttpMethod
+        get() = input[HTTP_METHOD]?.let { HttpMethod.valueOf(it.toString().toUpperCase()) }
+                ?: throw IllegalArgumentException("Unsupported http method ${input[HTTP_METHOD]}")
+
+    val pathVariables: Map<String, String>
+        @Suppress("unchecked_cast")
+        get() = input[PATH_PARAMETERS]?.let { it as Map<String, String> } ?: emptyMap()
+
+    val queryParameters: Map<String, String>
+        @Suppress("unchecked_cast")
+        get() = input[QUERY_PARAMETERS]?.let { it as Map<String, String> } ?: emptyMap()
+
+    companion object {
+        // HTTP constants
+        const val PATH: String = "path"
+        const val HTTP_METHOD: String = "httpMethod"
+        const val PATH_PARAMETERS: String = "pathParameters"
+        const val QUERY_PARAMETERS: String = "queryStringParameters"
+    }
+}
+
+data class ApiGatewayResponse(
         val statusCode: Int = 200,
-        var body: String? = null,
+        val body: String? = null,
         val headers: Map<String, String>? = Collections.emptyMap(),
         val isBase64Encoded: Boolean = false
 ) {
 
     companion object {
+        fun notFound() = build { statusCode = 404 }
         inline fun build(block: Builder.() -> Unit) = Builder().apply(block).build()
     }
 

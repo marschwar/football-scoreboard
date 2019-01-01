@@ -1,20 +1,32 @@
-sourceCompatibility = 1.5
-targetCompatibility = 1.5
+sourceCompatibility = 1.8
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "${sourceCompatibility}"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "${sourceCompatibility}"
+    }
+}
 
 tasks.withType(JavaCompile) {
-  options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
 }
 
 buildscript {
-  repositories {
-    mavenCentral()
-    maven { url "https://plugins.gradle.org/m2/" }
-  }
-  dependencies {
-    classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
-    classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
-    classpath "de.sebastianboegl.gradle.plugins:shadow-log4j-transformer:2.1.1"
-  }
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+        classpath "de.sebastianboegl.gradle.plugins:shadow-log4j-transformer:2.1.1"
+    }
 }
 
 apply plugin: 'java-library'
@@ -24,19 +36,30 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "de.sebastianboegl.shadow.transformer.log4j"
 
 repositories {
-  maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+test {
+    useJUnitPlatform()
 }
 
 dependencies {
-  compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
 
-  compile group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.0'
-  compile group: 'com.amazonaws', name: 'aws-lambda-java-log4j2', version:'1.1.0'
-  compile group: 'com.amazonaws', name: 'aws-lambda-java-events', version:'2.2.4'
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.0'
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-log4j2', version: '1.1.0'
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '2.2.4'
 
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version:'2.8.5'
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.8.5'
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version:'2.8.5'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8+'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8+'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8+'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5+'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5+'
+    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3+'
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    testImplementation 'org.slf4j:slf4j-nop:1.7+'
+    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2+'
 }
 
-task deploy(dependsOn: 'shadowJar')
+task deploy(dependsOn: ['build', 'shadowJar'])

@@ -1,7 +1,12 @@
-get-teams:
-  handler: de.codekenner.footballscoreboard.handler.GetTeamsHandler
+teams:
+  handler: de.codekenner.footballscoreboard.routing.RequestDispatcher
   events:
     - http:
         path: teams
         method: get
-        cors: true
+    - http:
+        path: teams/{id}
+        method: get
+    - http:
+        path: teams
+        method: post

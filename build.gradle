@@ -18,6 +18,10 @@ buildscript {
 
 allprojects {
     apply plugin: 'kotlin'
+
+    repositories {
+        mavenCentral()
+    }
 }
 
 task deploy(type: Exec, dependsOn: 'api:deploy') {
