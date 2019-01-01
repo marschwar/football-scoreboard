@@ -1,7 +1,7 @@
-hello:
-  handler: com.serverless.Handler
+get-teams:
+  handler: de.codekenner.footballscoreboard.handler.GetTeamsHandler
   events:
     - http:
-        path: hello
+        path: teams
         method: get
         cors: true

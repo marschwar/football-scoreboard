@@ -1,7 +1,7 @@
-group = 'com.serverless'
+group = 'de.codekenner.footballscoreboard'
 version = 'dev'
 
-description = """hello"""
+description = """Football Scoreboard is intended aa a crowd sourced live score for American Football games in Germany."""
 
 buildscript {
     ext {

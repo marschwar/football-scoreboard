@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: livescore
+service: football-scoreboard
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -47,7 +47,7 @@ provider:
 
 # you can add packaging information here
 package:
-  artifact: api/build/libs/api-dev-all.jar
+  artifact: api/build/libs/api-all.jar
 
 functions: ${file(api/serverless/functions.yml)}
 
