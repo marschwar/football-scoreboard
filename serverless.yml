@@ -47,16 +47,9 @@ provider:
 
 # you can add packaging information here
 package:
-  artifact: build/libs/hello-dev-all.jar
+  artifact: api/build/libs/api-dev-all.jar
 
-functions:
-  hello:
-    handler: com.serverless.Handler
-    events:
-      - http:
-          path: hello
-          method: get
-          cors: true
+functions: ${file(api/serverless/functions.yml)}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -103,4 +96,4 @@ functions:
 #       Description: "Description for the output"
 #       Value: "Some output value"
 resources:
-  Resources: ${file(./${self:provider.stage}-resources.yml)}
+  Resources: ${file(api/serverless/${self:provider.stage}-resources.yml)}
