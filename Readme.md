@@ -22,7 +22,11 @@ Create inline policy and assign it to a group which is assigned to a project use
                 "cloudformation:DeleteStack",
                 "cloudformation:DescribeStackEvents",
                 "cloudformation:DescribeStackResource",
-                "cloudformation:ValidateTemplate"
+                "cloudformation:ValidateTemplate",
+                "apigateway:POST",
+                "apigateway:DELETE",
+                "apigateway:PUT",
+                "apigateway:GET"
             ],
             "Resource": [
                 "*"
