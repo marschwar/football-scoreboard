@@ -6,6 +6,7 @@ import de.codekenner.footballscoreboard.ApiGatewayRequest
 import de.codekenner.footballscoreboard.ApiGatewayResponse
 import de.codekenner.footballscoreboard.HttpMethod
 import de.codekenner.footballscoreboard.controller.TeamsController
+import de.codekenner.footballscoreboard.repository.TeamsRepository
 import org.apache.logging.log4j.LogManager
 
 class RequestDispatcher(val routes: Map<String, Resource> = defaultRoutes()) : RequestHandler<Map<String, Any>, ApiGatewayResponse> {
@@ -13,22 +14,20 @@ class RequestDispatcher(val routes: Map<String, Resource> = defaultRoutes()) : R
     override fun handleRequest(input: Map<String, Any>, context: Context): ApiGatewayResponse {
         val request = ApiGatewayRequest(input, context)
         LOG.info("processing incoming request $request")
-        try {
-            return dispatch(request)
-        } catch (e: NotFound) {
-            return ApiGatewayResponse.notFound()
-        }
+        return dispatch(request)
     }
 
     private fun dispatch(request: ApiGatewayRequest): ApiGatewayResponse {
         val resource = PATH_REGEX.matchEntire(request.path)?.groupValues?.get(1)?.let { routes.get(it) }
-                ?: throw NotFound(request.path)
+
+        if (resource == null) return ApiGatewayResponse.NOT_FOUND
 
         return when (request.httpMethod) {
             HttpMethod.GET -> indexOrShow(request, resource)
+            HttpMethod.POST -> resource.controller.create(request)
             else -> {
                 LOG.info("ignoring request $request")
-                ApiGatewayResponse.notFound()
+                ApiGatewayResponse.NOT_FOUND
             }
         }
     }
@@ -42,7 +41,7 @@ class RequestDispatcher(val routes: Map<String, Resource> = defaultRoutes()) : R
 
     companion object {
         fun defaultRoutes() = mapOf(
-                "teams" to Resource(TeamsController())
+                "teams" to Resource(TeamsController(TeamsRepository()))
         )
 
         private val PATH_REGEX = """^/(\w+)(/.*)?""".toRegex()

@@ -3,6 +3,7 @@ package de.codekenner.footballscoreboard
 import com.amazonaws.services.lambda.runtime.Context
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.http.HttpStatus
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.nio.charset.StandardCharsets
@@ -20,6 +21,9 @@ enum class HttpMethod {
 data class ApiGatewayRequest(override val input: Map<String, Any>, override val context: Context) : Request {
     val path: String
         get() = input.getOrDefault(PATH, "") as String
+
+    val body: String?
+        get() = input["body"] as String
 
     val httpMethod: HttpMethod
         get() = input[HTTP_METHOD]?.let { HttpMethod.valueOf(it.toString().toUpperCase()) }
@@ -43,14 +47,17 @@ data class ApiGatewayRequest(override val input: Map<String, Any>, override val 
 }
 
 data class ApiGatewayResponse(
-        val statusCode: Int = 200,
+        val statusCode: Int = HttpStatus.SC_OK,
         val body: String? = null,
         val headers: Map<String, String>? = Collections.emptyMap(),
         val isBase64Encoded: Boolean = false
 ) {
 
     companion object {
-        fun notFound() = build { statusCode = 404 }
+        val NOT_FOUND = ApiGatewayResponse(statusCode = HttpStatus.SC_NOT_FOUND)
+        val CREATED = ApiGatewayResponse(statusCode = HttpStatus.SC_CREATED)
+        val INTERNAL_SERVER_ERROR = ApiGatewayResponse(statusCode = HttpStatus.SC_INTERNAL_SERVER_ERROR)
+        val UNPROCESSABLE_ENTITY = ApiGatewayResponse(statusCode = HttpStatus.SC_UNPROCESSABLE_ENTITY)
         inline fun build(block: Builder.() -> Unit) = Builder().apply(block).build()
     }
 

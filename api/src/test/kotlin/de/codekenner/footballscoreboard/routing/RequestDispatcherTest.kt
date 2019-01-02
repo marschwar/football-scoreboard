@@ -13,6 +13,6 @@ internal class RequestDispatcherTest : StringSpec({
         val context: Context = mock()
         val response = RequestDispatcher(emptyMap()).handleRequest(mapOf("path" to "/foo"), context)
 
-        response shouldBe ApiGatewayResponse.notFound()
+        response shouldBe ApiGatewayResponse.NOT_FOUND
     }
 })
